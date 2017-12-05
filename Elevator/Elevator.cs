@@ -11,7 +11,6 @@ namespace Elevator
         Up,
         Down,
         None
-        //Opening
     }
 
     public class Elevator
@@ -68,14 +67,12 @@ namespace Elevator
             {
                 MoveDirection = Direction.Down;
                 TimeAtTheLastFloor = DateTime.Now;
-                //Console.WriteLine("Состояние Down");
                 return true;
             }
             else if (_targetFloorsUp.Count != 0 & _targetFloorsUp.Count >= _targetFloorsDown.Count)
             {
                 MoveDirection = Direction.Up;
                 TimeAtTheLastFloor = DateTime.Now;
-                //Console.WriteLine("Состояние Up");
                 return true;
             }
             return false;
@@ -99,12 +96,8 @@ namespace Elevator
             }
             else if (DateTime.Now - TimeAtTheLastFloor >= FloorChangingTime)
             {
-                //if (MoveDirection == Direction.Up || MoveDirection == Direction.Down)
-                //{
-                
                 if (MoveDirection == Direction.Up)
-                {
-                    
+                {                  
                     //TimeFromTheLastFloor = DateTime.Now;
                     CurrentFloor += 1;
                     Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
@@ -117,8 +110,7 @@ namespace Elevator
                     //TimeAtTheLastFloor.Add(FloorChangingTime);
                 }
                 else
-                {
-                    
+                {                   
                     CurrentFloor -= 1;
                     Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
                     if (_targetFloorsDown.Contains(CurrentFloor))
@@ -129,7 +121,6 @@ namespace Elevator
                     }
                     //TimeAtTheLastFloor.Add(FloorChangingTime);
                 }
-                //}
                 TimeAtTheLastFloor.Add(FloorChangingTime);
             }
 

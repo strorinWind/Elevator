@@ -68,36 +68,22 @@ namespace Elevator
 
         private void Loop()
         {
-            //var t = Console.In.ReadLineAsync();
             var t = Task.Run(() => Console.ReadLine());
-            //t.RunSynchronously();
-            //var t = Console.Read();
             while (true)
             {
-                //var s = Console.;
-                //Task.Delay(10000);
-                //Thread.Sleep(1000);
-                //Console.WriteLine("Все идет нормально");
                 if (t.IsCompleted)
                 {
                     int num;
                     if (!int.TryParse(t.Result, out num) | num < 1 | num > el.N)
                     {
-                        Console.WriteLine("Некорректный формат ввода.");
-                        Console.WriteLine(el.TimeAtTheLastFloor + " " + el.MoveDirection + " " + el.CurrentFloor);
-                        Console.WriteLine((DateTime.Now - el.TimeAtTheLastFloor >= el.FloorChangingTime));
-                        Console.WriteLine(el.FloorChangingTime + " " + (DateTime.Now - el.TimeAtTheLastFloor) + " "+ el.TimeAtTheLastFloor);
-                    }
+                        Console.WriteLine("Некорректный формат ввода.");                    }
                     else
                     {
-                        //Console.WriteLine(t.Result);
                         el.AddTargetFloor(num);
                     }       
                     t = Task.Run(() => Console.ReadLine());
-                    //t.S
                 }
                 el.Move();
-                //Console.WriteLine(DateTime.Now +" "+ el.TimeFromTheLastFloor.ToString() + " " + (DateTime.Now - el.TimeFromTheLastFloor).ToString());
             }
         }
     }
