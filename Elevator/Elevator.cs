@@ -24,9 +24,7 @@ namespace Elevator
             private set { _n = value; }
         }
 
-        private double Height;
-        private double Speed;
-        private double OpenTime;
+        private TimeSpan OpenTime;
         private Direction MoveDirection = Direction.None;
         private int CurrentFloor;
         private DateTime TimeFromTheLastFloor;
@@ -37,7 +35,7 @@ namespace Elevator
 
         public void AddTargetFloor(int f)
         {
-            if (f<5 | f>N)
+            if (f < 5 | f > N)
             {
                 throw new ArgumentException("Неверный номер этажа");
             }
@@ -65,43 +63,76 @@ namespace Elevator
             }
         }
 
+        private bool SetDirectionIfNone()
+        {
+            if (_targetFloorsDown.Count != 0 & _targetFloorsDown.Count >= _targetFloorsUp.Count)
+            {
+                MoveDirection = Direction.Down;
+                TimeFromTheLastFloor = DateTime.Now;
+                return true;
+            }
+            else if (_targetFloorsUp.Count != 0 & _targetFloorsUp.Count >= _targetFloorsDown.Count)
+            {
+                MoveDirection = Direction.Up;
+                TimeFromTheLastFloor = DateTime.Now;
+                return true;
+            }
+            return false;
+        }
+
         public void Move()
         {
-            if (MoveDirection == Direction.None)
+            if (MoveDirection == Direction.None & !SetDirectionIfNone())
             {
-                if (_targetFloorsDown.Count != 0 & _targetFloorsDown.Count >= _targetFloorsUp.Count)
+                return; //Состояние так и осталось неопределенным
+            }
+
+            if (MoveDirection == Direction.Up || MoveDirection == Direction.Down)
+            {
+                if (DateTime.Now - TimeFromTheLastFloor >= FloorChangingTime)
                 {
-                    MoveDirection = Direction.Down;
-                    TimeFromTheLastFloor = DateTime.Now;
-                }
-                else if (_targetFloorsUp.Count != 0 & _targetFloorsUp.Count >= _targetFloorsDown.Count)
-                {
-                    MoveDirection = Direction.Up;
-                    TimeFromTheLastFloor = DateTime.Now;
-                }
-                else
-                {
-                    return; //Если мы так и не установили направление
+                    TimeFromTheLastFloor += FloorChangingTime;
+                    if (MoveDirection == Direction.Up)
+                    {
+                        CurrentFloor += 1;
+                        if (_targetFloorsUp.Contains(CurrentFloor))
+                        {
+                            MoveDirection = Direction.Opening;
+                            _targetFloorsUp.Remove(CurrentFloor);
+                        }
+                    }
+                    else
+                    {
+                        CurrentFloor -= 1;
+                        if (_targetFloorsDown.Contains(CurrentFloor))
+                        {
+                            MoveDirection = Direction.Opening;
+                            _targetFloorsDown.Remove(CurrentFloor);
+                        }
+                    }
                 }
             }
-            if (DateTime.Now - TimeFromTheLastFloor >= FloorChangingTime)
+            else if (MoveDirection == Direction.Opening)
             {
-                
+
             }
+
         }
 
         public Elevator(int n, double h, double s, double t)
         {
-            if (n<5 | n>20)
+            if (n < 5 | n > 20)
             {
                 throw new ArgumentException("Количество этажей может быть от 5 до 20.");
             }
+            if (h <= 0 | s <= 0 | t <= 0)
+            {
+                throw new ArgumentException("Параметры должны быть положительными.");
+            }
             N = n;
-            Height = h;
-            Speed = s;
-            OpenTime = t;
+            OpenTime = new TimeSpan(0, 0, 0, 0, (int)t * 1000);
             CurrentFloor = 1;
-            var c = Height / Speed * 1000;
+            var c = h / s * 1000;
             FloorChangingTime = new TimeSpan(0, 0, 0, 0, (int)c);
         }
     }
