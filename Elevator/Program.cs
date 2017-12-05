@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Elevator
@@ -15,6 +16,12 @@ namespace Elevator
             var p = new Program();
             p.el = p.InputStartData();
             p.PrintInstructions();
+            /*var t = Task.Run(() => p.Loop());
+            while (true)
+            {
+                Task.Delay(1000);
+                p.el.AddTargetFloor(int.Parse(Console.ReadLine()));
+            }*/
             p.Loop();
         }
 
@@ -61,22 +68,36 @@ namespace Elevator
 
         private void Loop()
         {
-            var t = Console.In.ReadLineAsync();
+            //var t = Console.In.ReadLineAsync();
+            var t = Task.Run(() => Console.ReadLine());
+            //t.RunSynchronously();
+            //var t = Console.Read();
             while (true)
             {
+                //var s = Console.;
+                //Task.Delay(10000);
+                //Thread.Sleep(1000);
+                //Console.WriteLine("Все идет нормально");
                 if (t.IsCompleted)
                 {
                     int num;
-                    if (!int.TryParse(t.Result, out num) | num<5 | num > el.N)
+                    if (!int.TryParse(t.Result, out num) | num < 1 | num > el.N)
                     {
                         Console.WriteLine("Некорректный формат ввода.");
+                        Console.WriteLine(el.TimeAtTheLastFloor + " " + el.MoveDirection + " " + el.CurrentFloor);
+                        Console.WriteLine((DateTime.Now - el.TimeAtTheLastFloor >= el.FloorChangingTime));
+                        Console.WriteLine(el.FloorChangingTime + " " + (DateTime.Now - el.TimeAtTheLastFloor) + " "+ el.TimeAtTheLastFloor);
                     }
                     else
                     {
-                        Console.WriteLine(t.Result);
+                        //Console.WriteLine(t.Result);
+                        el.AddTargetFloor(num);
                     }       
-                    t = Console.In.ReadLineAsync();
+                    t = Task.Run(() => Console.ReadLine());
+                    //t.S
                 }
+                el.Move();
+                //Console.WriteLine(DateTime.Now +" "+ el.TimeFromTheLastFloor.ToString() + " " + (DateTime.Now - el.TimeFromTheLastFloor).ToString());
             }
         }
     }

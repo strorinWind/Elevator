@@ -10,8 +10,8 @@ namespace Elevator
     {
         Up,
         Down,
-        None,
-        Opening
+        None
+        //Opening
     }
 
     public class Elevator
@@ -25,17 +25,18 @@ namespace Elevator
         }
 
         private TimeSpan OpenTime;
-        private Direction MoveDirection = Direction.None;
-        private int CurrentFloor;
-        private DateTime TimeFromTheLastFloor;
-        private TimeSpan FloorChangingTime;
+        public Direction MoveDirection;
+        public int CurrentFloor;
+        public DateTime TimeAtTheLastFloor;
+        public TimeSpan FloorChangingTime;
+        private bool Opening = false;
 
         private List<int> _targetFloorsUp = new List<int>();
         private List<int> _targetFloorsDown = new List<int>();
 
         public void AddTargetFloor(int f)
         {
-            if (f < 5 | f > N)
+            if (f < 1 |f > N)
             {
                 throw new ArgumentException("Неверный номер этажа");
             }
@@ -46,8 +47,6 @@ namespace Elevator
                         break;
 
                     _targetFloorsDown.Add(f);
-                    _targetFloorsDown.Sort();
-                    _targetFloorsDown.Reverse();
                     break;
                 case 0:
                     break;
@@ -56,11 +55,11 @@ namespace Elevator
                         break;
 
                     _targetFloorsUp.Add(f);
-                    _targetFloorsUp.Sort();
                     break;
                 default:
                     break;
             }
+            Console.WriteLine("Добавлено "+f);
         }
 
         private bool SetDirectionIfNone()
@@ -68,13 +67,15 @@ namespace Elevator
             if (_targetFloorsDown.Count != 0 & _targetFloorsDown.Count >= _targetFloorsUp.Count)
             {
                 MoveDirection = Direction.Down;
-                TimeFromTheLastFloor = DateTime.Now;
+                TimeAtTheLastFloor = DateTime.Now;
+                //Console.WriteLine("Состояние Down");
                 return true;
             }
             else if (_targetFloorsUp.Count != 0 & _targetFloorsUp.Count >= _targetFloorsDown.Count)
             {
                 MoveDirection = Direction.Up;
-                TimeFromTheLastFloor = DateTime.Now;
+                TimeAtTheLastFloor = DateTime.Now;
+                //Console.WriteLine("Состояние Up");
                 return true;
             }
             return false;
@@ -82,39 +83,54 @@ namespace Elevator
 
         public void Move()
         {
-            if (MoveDirection == Direction.None & !SetDirectionIfNone())
-            {
-                return; //Состояние так и осталось неопределенным
-            }
-
-            if (MoveDirection == Direction.Up || MoveDirection == Direction.Down)
-            {
-                if (DateTime.Now - TimeFromTheLastFloor >= FloorChangingTime)
+            if (MoveDirection == Direction.None)
+                if (!SetDirectionIfNone())
                 {
-                    TimeFromTheLastFloor += FloorChangingTime;
-                    if (MoveDirection == Direction.Up)
-                    {
-                        CurrentFloor += 1;
-                        if (_targetFloorsUp.Contains(CurrentFloor))
-                        {
-                            MoveDirection = Direction.Opening;
-                            _targetFloorsUp.Remove(CurrentFloor);
-                        }
-                    }
-                    else
-                    {
-                        CurrentFloor -= 1;
-                        if (_targetFloorsDown.Contains(CurrentFloor))
-                        {
-                            MoveDirection = Direction.Opening;
-                            _targetFloorsDown.Remove(CurrentFloor);
-                        }
-                    }
+                    return; //Состояние так и осталось неопределенным
+                }
+
+            if (Opening)
+            {
+                if (DateTime.Now - TimeAtTheLastFloor > OpenTime)
+                {
+                    Opening = false;
+                    Console.WriteLine("Лифт закрыл двери");
                 }
             }
-            else if (MoveDirection == Direction.Opening)
+            else if (DateTime.Now - TimeAtTheLastFloor >= FloorChangingTime)
             {
-
+                //if (MoveDirection == Direction.Up || MoveDirection == Direction.Down)
+                //{
+                
+                if (MoveDirection == Direction.Up)
+                {
+                    
+                    //TimeFromTheLastFloor = DateTime.Now;
+                    CurrentFloor += 1;
+                    Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
+                    if (_targetFloorsUp.Contains(CurrentFloor))
+                    {
+                        Opening = true;
+                        Console.WriteLine("Лифт открыл двери");
+                        _targetFloorsUp.Remove(CurrentFloor);
+                    }
+                    //TimeAtTheLastFloor.Add(FloorChangingTime);
+                }
+                else
+                {
+                    
+                    CurrentFloor -= 1;
+                    Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
+                    if (_targetFloorsDown.Contains(CurrentFloor))
+                    {
+                        Opening = true;
+                        Console.WriteLine("Лифт открыл двери");
+                        _targetFloorsDown.Remove(CurrentFloor);
+                    }
+                    //TimeAtTheLastFloor.Add(FloorChangingTime);
+                }
+                //}
+                TimeAtTheLastFloor.Add(FloorChangingTime);
             }
 
         }
@@ -134,6 +150,8 @@ namespace Elevator
             CurrentFloor = 1;
             var c = h / s * 1000;
             FloorChangingTime = new TimeSpan(0, 0, 0, 0, (int)c);
+            MoveDirection = Direction.None;
+            TimeAtTheLastFloor = DateTime.Now;
         }
     }
 }
