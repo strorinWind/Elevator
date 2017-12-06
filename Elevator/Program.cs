@@ -16,12 +16,6 @@ namespace Elevator
             var p = new Program();
             p.el = p.InputStartData();
             p.PrintInstructions();
-            /*var t = Task.Run(() => p.Loop());
-            while (true)
-            {
-                Task.Delay(1000);
-                p.el.AddTargetFloor(int.Parse(Console.ReadLine()));
-            }*/
             p.Loop();
         }
 
@@ -70,7 +64,7 @@ namespace Elevator
         {
             var t = Task.Run(() => Console.ReadLine());
             while (true)
-            {
+            {                
                 if (t.IsCompleted)
                 {
                     int num;
