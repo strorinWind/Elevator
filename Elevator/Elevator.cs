@@ -38,24 +38,23 @@ namespace Elevator
             {
                 throw new ArgumentException("Неверный номер этажа");
             }
+            if (_targetFloorsUp.Contains(f) | _targetFloorsDown.Contains(f))
+            {
+                return;
+            }
+
             switch (f.CompareTo(CurrentFloor))
             {
                 case -1:
-                    if (_targetFloorsDown.Contains(f))
-                        break;
                     _targetFloorsDown.Add(f);
                     break;
                 case 0:
                     switch (MoveDirection)
                     {
                         case Direction.Up:
-                            if (_targetFloorsDown.Contains(f))
-                                break;
                             _targetFloorsDown.Add(f);
                             break;
                         case Direction.Down:
-                            if (_targetFloorsUp.Contains(f))
-                                break;
                             _targetFloorsUp.Add(f);
                             break;
                         case Direction.None:
@@ -68,8 +67,6 @@ namespace Elevator
                     }
                     break;
                 case 1:
-                    if (_targetFloorsUp.Contains(f))
-                        break;
                     _targetFloorsUp.Add(f);
                     break;
                 default:
