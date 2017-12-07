@@ -24,10 +24,10 @@ namespace Elevator
         }
 
         private TimeSpan OpenTime;
-        public Direction MoveDirection;
-        public int CurrentFloor;
-        public DateTime TimeAtTheLastFloor;
-        public TimeSpan FloorChangingTime;
+        private Direction MoveDirection;
+        private int CurrentFloor;
+        private DateTime TimeAtTheLastFloor;
+        private TimeSpan FloorChangingTime;
         private bool Opening;
 
         private List<int> _targetFloorsUp = new List<int>();
@@ -47,23 +47,25 @@ namespace Elevator
                     _targetFloorsDown.Add(f);
                     break;
                 case 0:
-                    if (MoveDirection == Direction.None)
+                    switch (MoveDirection)
                     {
-                        TimeAtTheLastFloor = DateTime.Now;
-                        Opening = true;
-                        Console.WriteLine("Лифт открыл двери");
-                    }
-                    else if (MoveDirection == Direction.Up)
-                    {
-                        if (_targetFloorsDown.Contains(f))
+                        case Direction.Up:
+                            if (_targetFloorsDown.Contains(f))
+                                break;
+                            _targetFloorsDown.Add(f);
                             break;
-                        _targetFloorsDown.Add(f);
-                    }
-                    else
-                    {
-                        if (_targetFloorsUp.Contains(f))
+                        case Direction.Down:
+                            if (_targetFloorsUp.Contains(f))
+                                break;
+                            _targetFloorsUp.Add(f);
                             break;
-                        _targetFloorsUp.Add(f);
+                        case Direction.None:
+                            TimeAtTheLastFloor = DateTime.Now;
+                            Opening = true;
+                            Console.WriteLine("Лифт открыл двери");
+                            break;
+                        default:
+                            break;
                     }
                     break;
                 case 1:
@@ -98,9 +100,11 @@ namespace Elevator
             if (DateTime.Now - TimeAtTheLastFloor > OpenTime)
             {
                 Opening = false;
+                TimeAtTheLastFloor += OpenTime;
                 Console.WriteLine("Лифт закрыл двери");
                 if (MoveDirection == Direction.Up)
                 {
+                    _targetFloorsUp.Remove(CurrentFloor);
                     if (_targetFloorsUp.Count == 0 | CurrentFloor == N)
                     {
                         if (_targetFloorsDown.Count > 0)
@@ -111,6 +115,7 @@ namespace Elevator
                 }
                 else
                 {
+                    _targetFloorsDown.Remove(CurrentFloor);
                     if (_targetFloorsDown.Count == 0 | CurrentFloor == 1)
                     {
                         if (_targetFloorsUp.Count > 0)
@@ -138,26 +143,24 @@ namespace Elevator
             {
                 if (MoveDirection == Direction.Up)
                 {
-                    TimeAtTheLastFloor.Add(FloorChangingTime);
+                    TimeAtTheLastFloor += FloorChangingTime;
                     CurrentFloor += 1;
                     Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
                     if (_targetFloorsUp.Contains(CurrentFloor))
                     {
                         Opening = true;
                         Console.WriteLine("Лифт открыл двери");
-                        _targetFloorsUp.Remove(CurrentFloor);
                     }
                 }
                 else
                 {
-                    TimeAtTheLastFloor.Add(FloorChangingTime);
+                    TimeAtTheLastFloor += FloorChangingTime;
                     CurrentFloor -= 1;
                     Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
                     if (_targetFloorsDown.Contains(CurrentFloor))
                     {
                         Opening = true;
                         Console.WriteLine("Лифт открыл двери");
-                        _targetFloorsDown.Remove(CurrentFloor);
                     }
                 }
             }

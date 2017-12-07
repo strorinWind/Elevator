@@ -64,17 +64,18 @@ namespace Elevator
         {
             var t = Task.Run(() => Console.ReadLine());
             while (true)
-            {                
+            {
                 if (t.IsCompleted)
                 {
                     int num;
                     if (!int.TryParse(t.Result, out num) | num < 1 | num > el.N)
                     {
-                        Console.WriteLine("Некорректный формат ввода.");                    }
+                        Console.WriteLine("Некорректный формат ввода.");
+                    }
                     else
                     {
                         el.AddTargetFloor(num);
-                    }       
+                    }
                     t = Task.Run(() => Console.ReadLine());
                 }
                 el.Move();
