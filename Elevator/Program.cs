@@ -63,11 +63,11 @@ namespace Elevator
         private void Loop()
         {
             var t = Task.Run(() => Console.ReadLine());
+            int num;
             while (true)
             {
                 if (t.IsCompleted)
-                {
-                    int num;
+                {                  
                     if (!int.TryParse(t.Result, out num) | num < 1 | num > el.N)
                     {
                         Console.WriteLine("Некорректный формат ввода.");

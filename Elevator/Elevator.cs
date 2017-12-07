@@ -49,6 +49,10 @@ namespace Elevator
                     _targetFloorsDown.Add(f);
                     break;
                 case 0:
+                    if (Opening)
+                    {
+                        return;
+                    }
                     switch (MoveDirection)
                     {
                         case Direction.Up:
@@ -172,7 +176,7 @@ namespace Elevator
                 throw new ArgumentException("Параметры должны быть положительными.");
             }
             _n = n;
-            OpenTime = new TimeSpan(0, 0, 0, 0, (int)t * 1000);
+            OpenTime = new TimeSpan(0, 0, 0, 0, (int)(t * 1000));
             CurrentFloor = 1;
             var c = h / s * 1000;
             FloorChangingTime = new TimeSpan(0, 0, 0, 0, (int)c);
