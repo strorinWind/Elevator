@@ -20,7 +20,6 @@ namespace Elevator
         public int N
         {
             get { return _n; }
-            private set { _n = value; }
         }
 
         private TimeSpan OpenTime;
@@ -141,9 +140,9 @@ namespace Elevator
             }
             else if (DateTime.Now - TimeAtTheLastFloor >= FloorChangingTime)
             {
+                TimeAtTheLastFloor += FloorChangingTime;
                 if (MoveDirection == Direction.Up)
-                {
-                    TimeAtTheLastFloor += FloorChangingTime;
+                {          
                     CurrentFloor += 1;
                     Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
                     if (_targetFloorsUp.Contains(CurrentFloor))
@@ -154,7 +153,6 @@ namespace Elevator
                 }
                 else
                 {
-                    TimeAtTheLastFloor += FloorChangingTime;
                     CurrentFloor -= 1;
                     Console.WriteLine("Лифт проезжает этаж " + CurrentFloor);
                     if (_targetFloorsDown.Contains(CurrentFloor))
@@ -176,7 +174,7 @@ namespace Elevator
             {
                 throw new ArgumentException("Параметры должны быть положительными.");
             }
-            N = n;
+            _n = n;
             OpenTime = new TimeSpan(0, 0, 0, 0, (int)t * 1000);
             CurrentFloor = 1;
             var c = h / s * 1000;
